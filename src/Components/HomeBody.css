@@ -1,0 +1,31 @@
+.banner-container {
+  margin: 1%;
+}
+.banner img {
+  object-fit: cover;
+  width: 100%;
+  height: 400px;
+}
+
+.vertical-container {
+  display: flex;
+  justify-content: space-evenly;
+}
+.vertical-container div {
+  border: 1px solid white;
+  width: 100%;
+  margin: 1%;
+}
+
+@media screen and (max-width: 768px) {
+  .banner img {
+    height: 200px; /* Adjust height for smaller screens */
+  }
+
+  .vertical-container div {
+    width: 100%; /* Full width for individual sections on smaller screens */
+  }
+  .vertical-container {
+    flex-wrap: wrap;
+  }
+}
