@@ -1,6 +1,6 @@
-// ... (imports
 import React, { useState, useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
+import axios from "axios";
+import SearchBar from "./Search";
 import "./Product.css";
 
 export default function Products({ searchTerm }) {
@@ -8,20 +8,21 @@ export default function Products({ searchTerm }) {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(
-          `http://localhost:8080/api/pagination?page=${currentPage}&size=3`
-        );
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+        const baseURL = `http://localhost:8080/api/`;
+        const url = searchQuery
+          ? `${baseURL}products/search?query=${searchQuery}&page=${currentPage}&size=3`
+          : `${baseURL}pagination?page=${currentPage}&size=3`;
 
-        const data = await response.json();
+        const response = await axios.get(url);
+
+        const data = response.data;
         console.log("Data received:", data.content);
         setProducts(data.content || []);
         setTotalPages(data.totalPages || 1);
@@ -33,15 +34,24 @@ export default function Products({ searchTerm }) {
     };
 
     fetchData();
-  }, [currentPage]);
+  }, [currentPage, searchQuery]);
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
   };
+
+  const handleSearch = (searchQuery) => {
+    console.log(searchQuery);
+    setSearchQuery(searchQuery);
+    setCurrentPage(0);
+  };
+
   return (
     <>
       <h2>Product List</h2>
-      <p>{searchTerm}</p>
+      <div>
+        <SearchBar onSearch={handleSearch} />
+      </div>
       {loading && <p>Loading...</p>}
       <ul className="product-list">
         {products.map((product) => (
@@ -61,7 +71,7 @@ export default function Products({ searchTerm }) {
           </li>
         ))}
       </ul>
-      <div class="pagination-container">
+      <div className="pagination-container">
         <div className="pagination">
           <button
             onClick={() => handlePageChange(currentPage - 1)}
